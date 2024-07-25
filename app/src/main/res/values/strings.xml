@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">contact</string>
+    <string name="contactString">Контакты</string>
+    <string name="seacrContact">Поиск контактов ...</string>
+</resources>
