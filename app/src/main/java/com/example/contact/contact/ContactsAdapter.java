@@ -3,6 +3,7 @@ package com.example.contact.contact;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.telephony.SmsManager;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.Activity;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -26,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactViewHolder> {
-    private static final int SMS_PERMISSION_CODE = 101;
     private List<Contact> contacts;
     private List<Contact> filteredContacts;
     private Context context;
@@ -34,13 +35,18 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
     private String messageNumber;
     private String phoneNumber;
 
-    public ContactsAdapter(Context context, List<Contact> contacts, String messageNumber, String phoneNumber) {
+    public ContactsAdapter(Context context, List<Contact> contacts) {
         this.context = context;
         this.contacts = contacts;
-        this.messageNumber = messageNumber;
-        this.phoneNumber = phoneNumber;
+        loadSettings();
         this.filteredContacts = new ArrayList<>(contacts);
         sortContacts();
+    }
+
+    private void loadSettings() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("gateway", Context.MODE_PRIVATE);
+        this.messageNumber = sharedPreferences.getString("messageNumber", "empty");
+        this.phoneNumber = sharedPreferences.getString("phoneNumber", "empty");
     }
 
     @NonNull
@@ -57,10 +63,12 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         holder.contactPhoneNumber.setText(contact.getPhone());
 
         holder.buttonMessage.setOnClickListener(v -> {
+            loadSettings();
             showMessageDialog(editPhoneNumber(contact.getPhone()));
         });
 
         holder.buttonPhone.setOnClickListener(v -> {
+            loadSettings();
             String message = editPhoneNumber(contact.getPhone()) + "#";
             sendSMS(phoneNumber, message);
         });
@@ -125,26 +133,24 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
     }
 
     private void sendSMS(String phoneNumber, String message) {
-        if (phoneNumber.equals("empty")) {Toast.makeText(context, "У вас не добавлен номер шлюза в настройках.", Toast.LENGTH_SHORT).show();
+        if (phoneNumber.equals("empty")) {
+            Toast.makeText(context, "У вас не добавлен номер шлюза в настройках.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_CODE);
-        } else {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNumber, null, message, null, null);
-            Toast.makeText(context, "SMS отправлено", Toast.LENGTH_SHORT).show();
-        }
+        SmsManager smsManager = SmsManager.getDefault();
+        smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+        Toast.makeText(context, "SMS отправлено", Toast.LENGTH_SHORT).show();
+
     }
 
-    private String editPhoneNumber(String phoneNumber){
-        if (phoneNumber.length() == 11){
+    private String editPhoneNumber(String phoneNumber) {
+        if (phoneNumber.length() == 11) {
             return phoneNumber;
         }
         phoneNumber = phoneNumber.replaceAll("[^0-9]", "");
 
-        if (phoneNumber.startsWith("7")){
+        if (phoneNumber.startsWith("7")) {
             phoneNumber = phoneNumber.substring(1);
             phoneNumber = "8" + phoneNumber;
         }

@@ -1,5 +1,6 @@
 package com.example.contact;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -32,6 +33,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_CONTACTS = 1;
+    private static final int SMS_PERMISSION_CODE = 101;
 
     private RecyclerView recyclerView;
     private ContactsAdapter adapter;
@@ -78,9 +80,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        loadSettings();
 
-        adapter = new ContactsAdapter(this,contacts, messageNumber, phoneNumber);
+        adapter = new ContactsAdapter(this,contacts);
         recyclerView.setAdapter(adapter);
     }
 
@@ -133,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_CONTACTS && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             loadContacts();
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions((Activity) this, new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_CODE);
         }
     }
 
