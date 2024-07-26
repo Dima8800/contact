@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 
@@ -30,12 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final int REQUEST_CODE_CONTACTS = 1;
+
     private RecyclerView recyclerView;
     private ContactsAdapter adapter;
     private List<Contact> contacts;
     private ImageButton settingsButton;
+    private Button messageButton;
 
     private String messageNumber;
     private String phoneNumber;
@@ -48,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
         checkContactsPermission();
 
         settingsButton = findViewById(R.id.settingsButton);
-        settingsButton = findViewById(R.id.settingsButton);
+
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         loadSettings();
 
-        adapter = new ContactsAdapter(contacts);
+        adapter = new ContactsAdapter(this,contacts, messageNumber, phoneNumber);
         recyclerView.setAdapter(adapter);
     }
 
