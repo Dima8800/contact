@@ -57,11 +57,11 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         holder.contactPhoneNumber.setText(contact.getPhone());
 
         holder.buttonMessage.setOnClickListener(v -> {
-            showMessageDialog(contact.getPhone());
+            showMessageDialog(editPhoneNumber(contact.getPhone()));
         });
 
         holder.buttonPhone.setOnClickListener(v -> {
-            String message =contact.getPhone() + "#";
+            String message = editPhoneNumber(contact.getPhone()) + "#";
             sendSMS(phoneNumber, message);
         });
     }
@@ -136,5 +136,19 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
             smsManager.sendTextMessage(phoneNumber, null, message, null, null);
             Toast.makeText(context, "SMS отправлено", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private String editPhoneNumber(String phoneNumber){
+        if (phoneNumber.length() == 11){
+            return phoneNumber;
+        }
+        phoneNumber = phoneNumber.replaceAll("[^0-9]", "");
+
+        if (phoneNumber.startsWith("7")){
+            phoneNumber = phoneNumber.substring(1);
+            phoneNumber = "8" + phoneNumber;
+        }
+
+        return phoneNumber;
     }
 }
