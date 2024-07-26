@@ -2,4 +2,9 @@
     <string name="app_name">contact</string>
     <string name="contactString">Контакты</string>
     <string name="seacrContact">Поиск контактов ...</string>
+    <string name="saveSettings">Сохранить</string>
+    <string name="closeSettings">Вернуться назад</string>
+    <string name="messageS">для сообщений</string>
+    <string name="callS">для звонков</string>
+    <string name="S">Введите номер шлюза</string>
 </resources>
